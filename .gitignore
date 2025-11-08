@@ -1,4 +1,5 @@
 .angular/
 frontend/node_modules/
-.idea
-node_modules
+.idea/
+node_modules/
+**/__pycache__
