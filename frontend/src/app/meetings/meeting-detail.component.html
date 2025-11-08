@@ -39,7 +39,8 @@
       [prime]="true"
       [disabled]="summary?.status === 'pending' || loadingSummary"
       (click)="generateSummary()"
-      >Generate summary</app-button>
+      >Generate summary</app-button
+    >
   </app-card>
 
   <app-card title="Meeting Notes">
@@ -66,7 +67,6 @@
     </ul>
     <em *ngIf="!notesLoading && (!notes || !notes.length)">No notes yet</em>
 
-    
     <div class="note-form">
       <label for="author" class="label">Author</label>
       <input
@@ -78,7 +78,9 @@
         required
         (blur)="authorTouched = true"
       />
-      <p-message *ngIf="authorTouched && !author" severity="error" variant="simple" size="small">Author is required</p-message>
+      <p-message *ngIf="authorTouched && !author" severity="error" variant="simple" size="small"
+        >Author is required</p-message
+      >
 
       <label for="note" class="label label--mt">Note</label>
       <textarea
@@ -91,9 +93,13 @@
         required
         (blur)="noteTouched = true"
       ></textarea>
-      <p-message *ngIf="noteTouched && !text" severity="error" variant="simple" size="small">Note is required</p-message>
+      <p-message *ngIf="noteTouched && !text" severity="error" variant="simple" size="small"
+        >Note is required</p-message
+      >
 
-      <app-button [prime]="true" type="submit" (click)="addNote()" [disabled]="adding">Add Note</app-button>
+      <app-button [prime]="true" type="submit" (click)="addNote()" [disabled]="adding"
+        >Add Note</app-button
+      >
     </div>
   </app-card>
 </section>
