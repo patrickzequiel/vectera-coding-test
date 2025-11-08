@@ -10,7 +10,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: TODO - Setup Python and run backend tests
-        run: |
-          echo "Intentionally failing CI to prompt candidates to fix workflow."
-          exit 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r backend/requirements.txt
+
+      - name: Run backend tests
+        working-directory: backend
+        run: pytest -q

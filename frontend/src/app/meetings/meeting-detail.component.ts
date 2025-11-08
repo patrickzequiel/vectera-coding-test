@@ -1,64 +1,59 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MeetingsService } from './meetings.service';
+import { MessageService } from 'primeng/api';
 import { Meeting, Note, Summary } from './models';
 import { interval, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-meeting-detail',
-  template: `
-    <div *ngIf="loading">Loading…</div>
-    <div *ngIf="error" style="color:red">{{error}}</div>
-
-    <section *ngIf="meeting">
-      <h2>{{meeting.title}}</h2>
-      <p>Started at: {{meeting.started_at}}</p>
-
-      <aside>
-        <h3>Summary</h3>
-        <div *ngIf="summary; else noSummary">
-          <p>Status: {{summary?.status}}</p>
-          <pre *ngIf="summary?.status === 'ready'">{{summary?.content}}</pre>
-        </div>
-        <ng-template #noSummary><em>No summary yet</em></ng-template>
-        <button (click)="generateSummary()">Generate summary</button>
-      </aside>
-
-      <section>
-        <h3>Notes</h3>
-        <ul>
-          <li *ngFor="let n of notes">{{n.created_at}} — <strong>{{n.author}}:</strong> {{n.text}}</li>
-        </ul>
-        <form (ngSubmit)="addNote()" style="margin-top:1rem;">
-          <input [(ngModel)]="author" name="author" placeholder="Your name" required>
-          <input [(ngModel)]="text" name="text" placeholder="Note text" required>
-          <button type="submit">Add note</button>
-        </form>
-      </section>
-    </section>
-  `
+  templateUrl: './meeting-detail.component.html',
+  styleUrls: ['./meeting-detail.component.css'],
 })
 export class MeetingDetailComponent implements OnInit, OnDestroy {
   meeting: Meeting | null = null;
   notes: Note[] = [];
   summary: Summary | null = null;
+  notesLoading = false;
 
   author = '';
   text = '';
+  authorTouched = false;
+  noteTouched = false;
 
   loading = false;
+  loadingSummary = false;
   error: string | null = null;
+  adding = false;
 
   pollSub?: Subscription;
 
-  constructor(private route: ActivatedRoute, private api: MeetingsService) {}
+  constructor(
+    private route: ActivatedRoute,
+    private api: MeetingsService,
+    private router: Router,
+    private messages: MessageService,
+  ) {}
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.loading = true;
     this.api.getMeeting(id).subscribe({
-      next: (m) => { this.meeting = m; this.loading = false; this.fetchNotes(); this.fetchSummary(); },
-      error: (e) => { this.error = 'Failed to load meeting'; this.loading = false; console.error(e); }
+      next: (m) => {
+        this.meeting = m;
+        this.loading = false;
+        this.fetchNotes();
+        this.fetchSummary();
+      },
+      error: () => {
+        this.error = 'Could not load meeting';
+        this.loading = false;
+        this.messages.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Could not load meeting',
+        });
+      },
     });
   }
 
@@ -68,25 +63,65 @@ export class MeetingDetailComponent implements OnInit, OnDestroy {
 
   fetchNotes(page = 1) {
     if (!this.meeting) return;
+    this.notesLoading = true;
     this.api.listNotes(this.meeting.id, page).subscribe({
-      next: (res) => { this.notes = res.results || res; },
-      error: (e) => { console.error(e); }
+      next: (res) => {
+        this.notes = res.results || res;
+        this.notesLoading = false;
+      },
+      error: () => {
+        this.notesLoading = false;
+        this.messages.add({
+          severity: 'error',
+          summary: 'Load failed',
+          detail: 'Could not load notes',
+        });
+      },
     });
   }
 
   fetchSummary() {
     if (!this.meeting) return;
+    this.loadingSummary = true;
     this.api.getSummary(this.meeting.id).subscribe({
-      next: (s) => { this.summary = s; },
-      error: (e) => { /* likely 404 if none yet */ }
+      next: (s) => {
+        this.summary = s;
+        this.loadingSummary = false;
+      },
+      error: () => {
+        this.loadingSummary = false;
+        this.messages.add({
+          severity: 'error',
+          summary: 'Load failed',
+          detail: 'Could not load summary',
+        });
+      },
     });
   }
 
   addNote() {
     if (!this.meeting) return;
+    this.authorTouched = true;
+    this.noteTouched = true;
+    if (!this.author || !this.text) return;
+    this.adding = true;
     this.api.addNote(this.meeting.id, { author: this.author, text: this.text }).subscribe({
-      next: (n) => { this.notes = [...this.notes, n]; this.author=''; this.text=''; },
-      error: (e) => { console.error(e); }
+      next: (n) => {
+        this.notes = [...this.notes, n];
+        this.author = '';
+        this.text = '';
+        this.authorTouched = false;
+        this.noteTouched = false;
+        this.adding = false;
+      },
+      error: () => {
+        this.adding = false;
+        this.messages.add({
+          severity: 'error',
+          summary: 'Add failed',
+          detail: 'Could not add note',
+        });
+      },
     });
   }
 
@@ -94,7 +129,6 @@ export class MeetingDetailComponent implements OnInit, OnDestroy {
     if (!this.meeting) return;
     this.api.summarize(this.meeting.id).subscribe({
       next: () => {
-        // poll every 2s for updated status
         this.pollSub?.unsubscribe();
         this.pollSub = interval(2000).subscribe(() => {
           this.api.getSummary(this.meeting!.id).subscribe({
@@ -102,11 +136,50 @@ export class MeetingDetailComponent implements OnInit, OnDestroy {
               this.summary = s;
               if (s.status !== 'pending') this.pollSub?.unsubscribe();
             },
-            error: () => { /* keep polling */ }
+            error: () => {},
           });
         });
       },
-      error: (e) => { console.error(e); }
+      error: () => {
+        this.messages.add({
+          severity: 'error',
+          summary: 'Action failed',
+          detail: 'Could not start summary',
+        });
+      },
     });
+  }
+
+  goBack() {
+    this.router.navigate(['/meetings']);
+  }
+
+  statusSeverity(status?: string): 'success' | 'warning' | 'danger' | 'info' {
+    switch (status) {
+      case 'ready':
+        return 'success';
+      case 'pending':
+        return 'warning';
+      case 'failed':
+        return 'danger';
+      default:
+        return 'info';
+    }
+  }
+  statusLabel(status?: string): string {
+    if (!status) return '';
+    return status.charAt(0).toUpperCase() + status.slice(1);
+  }
+  statusIcon(status?: string): string {
+    switch (status) {
+      case 'ready':
+        return 'pi pi-check';
+      case 'pending':
+        return 'pi pi-clock';
+      case 'failed':
+        return 'pi pi-exclamation-triangle';
+      default:
+        return '';
+    }
   }
 }

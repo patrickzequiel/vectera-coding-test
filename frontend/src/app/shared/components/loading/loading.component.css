@@ -1,0 +1,12 @@
+.loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--grey-3);
+}
+.loading.inline {
+  display: inline-flex;
+}
+.loading .pi {
+  font-size: 1rem;
+}

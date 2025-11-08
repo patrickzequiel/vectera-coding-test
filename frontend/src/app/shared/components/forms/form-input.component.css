@@ -1,0 +1,17 @@
+:host {
+  display: block;
+}
+
+.group {
+  max-width: 28rem;
+  display: grid;
+  gap: 12px;
+}
+
+.label {
+  font-weight: 600;
+}
+
+.input {
+  width: 100%;
+}

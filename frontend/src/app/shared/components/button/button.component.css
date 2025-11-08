@@ -1,0 +1,81 @@
+.button.nav-bar-button {
+  border-radius: 5px;
+  margin-bottom: 0;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  font-size: 20px;
+  line-height: 24px;
+}
+
+@media screen and (max-width: 991px) {
+  .button {
+    white-space: nowrap;
+    flex-wrap: nowrap;
+    height: auto;
+    padding-left: 20px;
+    padding-right: 20px;
+    overflow: visible;
+  }
+}
+
+.button {
+  margin-top: 20px;
+  background-color: var(--primary-1);
+  color: var(--white);
+  text-align: center;
+  cursor: pointer;
+  border-radius: 5px;
+  justify-content: center;
+  align-items: center;
+  max-width: 300px;
+  padding: 12px 24px;
+  font-family: Muli, sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: box-shadow 0.2s;
+  display: flex;
+  border: none;
+}
+
+.w-button {
+  color: var(--white);
+  line-height: inherit;
+  cursor: pointer;
+  background-color: var(--primary-1);
+  border: 0;
+  border-radius: 0;
+  padding: 9px 15px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+a {
+  color: var(--primary-1);
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.button:hover {
+  background-color: var(--primary-400);
+}
+
+/* When PrimeNG styles are applied (prime=true), keep our hover */
+.button.p-button:enabled:hover,
+.button.p-button:enabled:focus {
+  background-color: var(--primary-400);
+  border-color: var(--primary-400);
+  color: var(--white);
+}
+
+.p-button.p-button-text,
+.p-button.p-button-text .p-button-icon {
+  color: var(--primary-1);
+}
+
+.p-inputtext:enabled:focus,
+.p-inputtextarea:enabled:focus {
+  border-color: var(--primary-1);
+  box-shadow: 0 0 0 1px var(--primary-1);
+}

@@ -1,0 +1,16 @@
+<div class="group">
+  <label class="label" [attr.for]="id">{{ label }}</label>
+  <input
+    pInputText
+    class="input"
+    [id]="id"
+    [attr.name]="name || id"
+    [type]="type"
+    [placeholder]="placeholder"
+    [required]="required"
+    [disabled]="disabled"
+    [value]="value"
+    (input)="onInput($event)"
+    (blur)="onTouched()"
+  />
+</div>

@@ -1,31 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { MessageService } from 'primeng/api';
 import { MeetingsService } from './meetings.service';
 import { Meeting } from './models';
 
 @Component({
   selector: 'app-meetings-list',
-  template: `
-    <section>
-      <h2>Meetings</h2>
-      <form (ngSubmit)="create()" style="margin-bottom:1rem;">
-        <input [(ngModel)]="title" name="title" placeholder="Title" required>
-        <input [(ngModel)]="started_at" name="started_at" placeholder="Started at (ISO)" required>
-        <button type="submit">Create</button>
-      </form>
-
-      <div *ngIf="loading">Loading...</div>
-      <div *ngIf="error" style="color:red">{{error}}</div>
-
-      <ul>
-        <li *ngFor="let m of meetings" (click)="open(m)" style="cursor:pointer">
-          <strong>{{m.title}}</strong> — {{m.started_at}}
-          <span> • notes: {{m.note_count}}</span>
-          <span *ngIf="m.latest_summary"> • summary: {{m.latest_summary?.status}}</span>
-        </li>
-      </ul>
-    </section>
-  `
+  styleUrls: ['./meetings-list.component.css'],
+  templateUrl: './meetings-list.component.html',
 })
 export class MeetingsListComponent implements OnInit {
   meetings: Meeting[] = [];
@@ -34,8 +16,14 @@ export class MeetingsListComponent implements OnInit {
 
   title = '';
   started_at = '';
+  submitted = false;
+  creating = false;
 
-  constructor(private api: MeetingsService, private router: Router) {}
+  constructor(
+    private api: MeetingsService,
+    private router: Router,
+    private messages: MessageService,
+  ) {}
 
   ngOnInit(): void {
     this.fetch();
@@ -44,17 +32,78 @@ export class MeetingsListComponent implements OnInit {
   fetch() {
     this.loading = true;
     this.api.listMeetings().subscribe({
-      next: (res) => { this.meetings = res.results || res; this.loading = false; },
-      error: (err) => { this.error = 'Failed to load'; this.loading = false; console.error(err); }
+      next: (res) => {
+        this.meetings = res.results || res;
+        this.loading = false;
+      },
+      error: () => {
+        this.error = 'Could not load meetings';
+        this.loading = false;
+        this.messages.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Could not load meetings',
+        });
+      },
     });
   }
 
-  open(m: Meeting) { this.router.navigate(['/meetings', m.id]); }
+  open(m: Meeting) {
+    this.router.navigate(['/meetings', m.id]);
+  }
 
   create() {
+    this.submitted = true;
+    if (!this.title || !this.started_at) return;
+    this.creating = true;
     this.api.createMeeting({ title: this.title, started_at: this.started_at }).subscribe({
-      next: () => { this.title = ''; this.started_at=''; this.fetch(); },
-      error: (err) => { this.error = 'Failed to create'; console.error(err); }
+      next: () => {
+        this.title = '';
+        this.started_at = '';
+        this.submitted = false;
+        this.creating = false;
+        this.fetch();
+      },
+      error: () => {
+        this.error = 'Could not create meeting';
+        this.creating = false;
+        this.messages.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Could not create meeting',
+        });
+      },
     });
+  }
+
+  statusSeverity(status?: string): 'success' | 'warning' | 'danger' | 'info' {
+    switch (status) {
+      case 'ready':
+        return 'success';
+      case 'pending':
+        return 'warning';
+      case 'failed':
+        return 'danger';
+      default:
+        return 'info';
+    }
+  }
+
+  statusLabel(status?: string): string {
+    if (!status) return '';
+    return status.charAt(0).toUpperCase() + status.slice(1);
+  }
+
+  statusIcon(status?: string): string {
+    switch (status) {
+      case 'ready':
+        return 'pi pi-check';
+      case 'pending':
+        return 'pi pi-clock';
+      case 'failed':
+        return 'pi pi-exclamation-triangle';
+      default:
+        return '';
+    }
   }
 }

@@ -1,0 +1,51 @@
+:host {
+  display: block;
+}
+
+.form {
+  margin-bottom: 1rem;
+  display: grid;
+  gap: 12px;
+}
+
+.error {
+  color: var(--danger-1);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--grey-2);
+  cursor: pointer;
+}
+.row:last-child {
+  border-bottom: none;
+}
+.row__main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.row__title {
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  color: var(--semi-black);
+}
+.row__sub {
+  color: var(--grey-3);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+.row__meta {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  color: var(--grey-3);
+}
+.row__tag {
+  margin-left: 0.5rem;
+}
+.row__chev {
+  color: var(--grey-4);
+}

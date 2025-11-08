@@ -1,0 +1,59 @@
+<app-card title="Create New Meeting">
+  <form (ngSubmit)="create()" class="form">
+    <app-form-input
+      id="title"
+      name="title"
+      label="Title"
+      placeholder="Enter meeting title"
+      [(ngModel)]="title"
+      required
+    ></app-form-input>
+    <p-message *ngIf="submitted && !title" severity="error" variant="simple" size="small"
+      >Title is required</p-message
+    >
+    <app-form-input
+      id="started_at"
+      name="started_at"
+      label="Started at (ISO)"
+      placeholder="Started at (ISO)"
+      type="datetime-local"
+      [(ngModel)]="started_at"
+      required
+    ></app-form-input>
+    <p-message *ngIf="submitted && !started_at" severity="error" variant="simple" size="small"
+      >Started at is required</p-message
+    >
+    <app-button type="submit" [prime]="true" [disabled]="creating">Create</app-button>
+  </form>
+</app-card>
+
+<app-error *ngIf="error" [message]="error"></app-error>
+
+<app-card title="Recent Meetings">
+  <app-loading *ngIf="loading" message="Loading meetings..."></app-loading>
+  <p-dataView [value]="meetings" [layout]="'list'">
+    <ng-template pTemplate="list" let-data>
+      <div *ngFor="let item of data" class="row" (click)="open(item)">
+        <div class="row__main">
+          <div class="row__title">{{ item.title }}</div>
+          <div class="row__sub">
+            Started at: {{ item.started_at | date: "MMMM d, y 'at' h:mm a" }}
+          </div>
+          <div class="row__meta">
+            <i class="pi pi-comments"></i>
+            <span>{{ item.note_count }} notes</span>
+            <p-tag
+              *ngIf="item.latest_summary as s"
+              class="row__tag"
+              [value]="'Summary ' + statusLabel(s.status)"
+              [severity]="statusSeverity(s.status)"
+              [icon]="statusIcon(s.status)"
+              styleClass="tag--soft"
+            ></p-tag>
+          </div>
+        </div>
+        <i class="pi pi-chevron-right row__chev"></i>
+      </div>
+    </ng-template>
+  </p-dataView>
+</app-card>

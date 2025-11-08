@@ -1,0 +1,15 @@
+<ng-container *ngIf="href; else buttonEl">
+  <a [href]="href" [attr.target]="target" [ngClass]="classes" [attr.pButton]="prime ? '' : null">
+    <ng-content></ng-content>
+  </a>
+</ng-container>
+<ng-template #buttonEl>
+  <button
+    [attr.type]="type"
+    [disabled]="disabled"
+    [ngClass]="classes"
+    [attr.pButton]="prime ? '' : null"
+  >
+    <ng-content></ng-content>
+  </button>
+</ng-template>

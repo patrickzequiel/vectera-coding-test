@@ -1,0 +1,106 @@
+<app-loading *ngIf="loading" [inline]="true">Loading...</app-loading>
+<app-error *ngIf="error" [message]="error"></app-error>
+
+<section *ngIf="meeting">
+  <div class="header">
+    <button
+      type="button"
+      pButton
+      class="p-button-text p-button-rounded"
+      icon="pi pi-arrow-left"
+      (click)="goBack()"
+    ></button>
+    <div>
+      <h2 class="title">{{ meeting.title }}</h2>
+      <p class="subtitle">Started at: {{ meeting.started_at | date: "MMMM d, y 'at' h:mm a" }}</p>
+    </div>
+  </div>
+
+  <app-card title="Summary">
+    <div *ngIf="summary">
+      <p-tag
+        [value]="statusLabel(summary?.status)"
+        [severity]="statusSeverity(summary?.status)"
+        [icon]="statusIcon(summary?.status)"
+        styleClass="tag--soft"
+      ></p-tag>
+    </div>
+    <div *ngIf="summary; else noSummary">
+      <p *ngIf="summary?.status === 'ready'">
+        {{ summary?.content }}
+      </p>
+    </div>
+    <div *ngIf="loadingSummary">
+      <app-loading [inline]="true" message="Loading summary..."></app-loading>
+    </div>
+    <ng-template #noSummary><em>No summary yet</em></ng-template>
+    <app-button
+      type="button"
+      [prime]="true"
+      [disabled]="summary?.status === 'pending' || loadingSummary"
+      (click)="generateSummary()"
+      >Generate summary</app-button
+    >
+  </app-card>
+
+  <app-card title="Meeting Notes">
+    <app-loading *ngIf="notesLoading" message="Loading notes..."></app-loading>
+    <p-divider *ngIf="notes?.length" styleClass="notes-divider"></p-divider>
+    <ul *ngIf="!notesLoading && notes?.length" class="notes-list">
+      <li *ngFor="let n of notes; let last = last">
+        <div class="note-row">
+          <p-avatar
+            [label]="n.author?.[0].toUpperCase() || '?'"
+            shape="circle"
+            styleClass="p-avatar-sm"
+          ></p-avatar>
+          <div class="note-content">
+            <div class="note-author">
+              {{ n.author }}
+              <span class="note-timestamp">{{ n.created_at | date: 'h:mm a' }}</span>
+            </div>
+            <div class="note-text">{{ n.text }}</div>
+          </div>
+        </div>
+        <p-divider *ngIf="!last" styleClass="m-0"></p-divider>
+      </li>
+    </ul>
+    <em *ngIf="!notesLoading && (!notes || !notes.length)">No notes yet</em>
+
+    <p-divider *ngIf="!last" styleClass="m-0"></p-divider>
+    <div class="note-form">
+      <label for="author" class="label">Author</label>
+      <input
+        pInputText
+        id="author"
+        [(ngModel)]="author"
+        name="author"
+        placeholder="Your name"
+        required
+        (blur)="authorTouched = true"
+      />
+      <p-message *ngIf="authorTouched && !author" severity="error" variant="simple" size="small"
+        >Author is required</p-message
+      >
+
+      <label for="note" class="label label--mt">Note</label>
+      <textarea
+        pInputTextarea
+        id="note"
+        [(ngModel)]="text"
+        name="text"
+        placeholder="Add your note..."
+        rows="4"
+        required
+        (blur)="noteTouched = true"
+      ></textarea>
+      <p-message *ngIf="noteTouched && !text" severity="error" variant="simple" size="small"
+        >Note is required</p-message
+      >
+
+      <app-button [prime]="true" type="submit" (click)="addNote()" [disabled]="adding"
+        >Add Note</app-button
+      >
+    </div>
+  </app-card>
+</section>

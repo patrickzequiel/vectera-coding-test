@@ -1,0 +1,5 @@
+<span [ngClass]="{ inline: inline }" class="loading" aria-live="polite">
+  <i class="pi pi-spinner pi-spin"></i>
+  <span *ngIf="message" class="msg">{{ message }}</span>
+  <ng-content></ng-content>
+</span>
