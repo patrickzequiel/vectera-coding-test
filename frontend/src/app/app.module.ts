@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { RouterModule, Routes } from '@angular/router';
 
 import { AppComponent } from './app.component';
@@ -25,7 +25,6 @@ import { MessageService } from 'primeng/api';
 import { FormInputComponent } from './shared/components/forms/form-input.component';
 import { LoadingComponent } from './shared/components/loading/loading.component';
 import { ErrorComponent } from './shared/components/error/error.component';
-import { HttpErrorInterceptor } from './shared/http/http-error.interceptor';
 
 const routes: Routes = [
   { path: '', redirectTo: 'meetings', pathMatch: 'full' },
@@ -62,10 +61,7 @@ const routes: Routes = [
     DividerModule,
     RouterModule.forRoot(routes),
   ],
-  providers: [
-    MessageService,
-    { provide: HTTP_INTERCEPTORS, useClass: HttpErrorInterceptor, multi: true },
-  ],
+  providers: [MessageService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
