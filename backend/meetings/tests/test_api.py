@@ -72,7 +72,7 @@ def test_summarize_and_get_summary():
     res = client.post(summarize_url, {}, format="json")
     assert res.status_code == 202
 
-    summary_url = reverse("meeting-summary", args=[meeting_id])
+    summary_url = reverse("meeting-get-summary", args=[meeting_id])
     res = client.get(summary_url)
     assert res.status_code == 200
     body = res.json()
@@ -88,6 +88,6 @@ def test_get_summary_404_before_generated():
     started_at = timezone.now().isoformat()
     m_res = client.post(m_url, {"title": "Planning", "started_at": started_at}, format="json")
     meeting_id = m_res.json()["id"]
-    summary_url = reverse("meeting-summary", args=[meeting_id])
+    summary_url = reverse("meeting-get-summary", args=[meeting_id])
     res = client.get(summary_url)
     assert res.status_code == 404

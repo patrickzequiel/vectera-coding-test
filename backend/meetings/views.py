@@ -86,5 +86,5 @@ class MeetingViewSet(viewsets.ModelViewSet):
         meeting = get_object_or_404(Meeting, pk=pk)
         summary = getattr(meeting, "summary", None)
         if not summary:
-            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND) 
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         return Response(SummarySerializer(summary).data, status=status.HTTP_200_OK)
