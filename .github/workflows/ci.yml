@@ -3,21 +3,10 @@ name: CI
 on:
   push:
   pull_request:
-  workflow_dispatch:
-    inputs:
-      target:
-        description: Select which part to run
-        type: choice
-        required: true
-        default: both
-        options:
-          - both
-          - backend
-          - frontend
 
 jobs:
   backend:
-    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.target == 'backend' || github.event.inputs.target == 'both' }}
+    name: Backend - Build And Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -36,7 +25,7 @@ jobs:
         run: pytest -q
 
   frontend:
-    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.target == 'frontend' || github.event.inputs.target == 'both' }}
+    name: Frontend - Build And Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
