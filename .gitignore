@@ -3,3 +3,4 @@ frontend/node_modules/
 .idea/
 node_modules/
 **/__pycache__
+out-tsc/

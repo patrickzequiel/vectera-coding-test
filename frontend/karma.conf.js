@@ -1,5 +1,6 @@
 // Karma configuration
 module.exports = function (config) {
+  const isCI = !!process.env.CI;
   config.set({
     basePath: '',
     frameworks: ['jasmine', '@angular-devkit/build-angular'],
@@ -16,9 +17,15 @@ module.exports = function (config) {
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
-    autoWatch: true,
-    browsers: ['ChromeHeadless'],
-    singleRun: false,
+    browsers: isCI ? ['ChromeHeadlessNoSandbox'] : ['ChromeHeadless'],
+    autoWatch: isCI ? false : true,
+    singleRun: isCI ? true : false,
+    customLaunchers: {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage']
+      }
+    },
     restartOnFileChange: true
   });
 };
