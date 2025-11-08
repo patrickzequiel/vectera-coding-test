@@ -6,7 +6,6 @@
         "start": "ng serve --proxy-config proxy.conf.json",
         "build": "ng build",
         "test": "ng test --watch=false",
-        "test:once": "ng test --watch=false",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "format": "prettier --write \"src/**/*.{ts,js,html,css,scss,md,json}\"",
