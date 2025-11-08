@@ -13,4 +13,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# Ensure entry script is executable in container
+RUN chmod +x run-server.sh
+
 EXPOSE 8000

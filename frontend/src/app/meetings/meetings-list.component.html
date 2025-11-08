@@ -8,9 +8,7 @@
       [(ngModel)]="title"
       required
     ></app-form-input>
-    <p-message *ngIf="submitted && !title" severity="error" variant="simple" size="small"
-      >Title is required</p-message
-    >
+    <p-message *ngIf="submitted && !title" severity="error" variant="simple" size="small">Title is required</p-message>
     <app-form-input
       id="started_at"
       name="started_at"
@@ -20,9 +18,7 @@
       [(ngModel)]="started_at"
       required
     ></app-form-input>
-    <p-message *ngIf="submitted && !started_at" severity="error" variant="simple" size="small"
-      >Started at is required</p-message
-    >
+    <p-message *ngIf="submitted && !started_at" severity="error" variant="simple" size="small">Started at is required</p-message>
     <app-button type="submit" [prime]="true" [disabled]="creating">Create</app-button>
   </form>
 </app-card>
