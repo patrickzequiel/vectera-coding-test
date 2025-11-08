@@ -40,6 +40,12 @@ jobs:
         id: setup-chrome
         uses: browser-actions/setup-chrome@v1
 
+      - name: Prepare Chrome wrapper (no-sandbox)
+        run: |
+          echo '#!/usr/bin/env bash' > chrome-with-flags.sh
+          echo '${{ steps.setup-chrome.outputs.chrome-path }} --no-sandbox --disable-gpu --disable-dev-shm-usage "$@"' >> chrome-with-flags.sh
+          chmod +x chrome-with-flags.sh
+
       - name: Install frontend dependencies
         working-directory: frontend
         run: npm ci
@@ -55,5 +61,5 @@ jobs:
       - name: Run frontend tests (Jasmine/Karma)
         working-directory: frontend
         env:
-          CHROME_BIN: ${{ steps.setup-chrome.outputs.chrome-path }}
+          CHROME_BIN: ${{ github.workspace }}/chrome-with-flags.sh
         run: npm test -- --watch=false --browsers=ChromeHeadless
